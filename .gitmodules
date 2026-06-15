@@ -1,0 +1,8 @@
+[submodule "VictoryCenter-Client"]
+	path = VictoryCenter-Client
+	url = https://github.com/ita-social-projects/VictoryCenter-Client.git
+	branch = release/1.0.0
+[submodule "VictoryCenter-Back"]
+	path = VictoryCenter-Back
+	url = https://github.com/ita-social-projects/VictoryCenter-Back.git
+	branch = release/1.0.0

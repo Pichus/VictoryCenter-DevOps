@@ -1,14 +1,44 @@
-# VictoryCenter-DevOps
+# VictoryCenter DevOps
 
+Infrastructure and deployment configuration for VictoryCenter.
 
-To run this playbook for installing Github Actions Self-Hosted Runner use:
+## Submodules
 
-ansible-playbook install_gh_actions_runner.yml --extra-vars "runner_user=user1 github_account=account1 github_repo=myorg1”
+This repo includes two submodules:
 
-or in JSON format:
+| Folder | Repo | Branch |
+|--------|------|--------|
+| `VictoryCenter-Client` | [VictoryCenter-Client](https://github.com/ita-social-projects/VictoryCenter-Client) | `release/1.0.0` |
+| `VictoryCenter-Back` | [VictoryCenter-Back](https://github.com/ita-social-projects/VictoryCenter-Back) | `release/1.0.0` |
 
-ansible-playbook install_gh_actions_runner.yml --extra-vars "{"github_account": "account1", "github_repo": "myorg1", "runner_user": "user1"}”
+### Clone with submodules
 
+```bash
+git clone --recurse-submodules https://github.com/Pichus/VictoryCenter-DevOps.git
+```
 
-Docs:
-https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#json-string-format
+If already cloned without submodules:
+
+```bash
+git submodule update --init --recursive
+```
+
+### Update submodules to latest commits on their branch
+
+```bash
+git submodule update --remote --merge
+```
+
+Or update a single submodule:
+
+```bash
+git submodule update --remote --merge VictoryCenter-Client
+git submodule update --remote --merge VictoryCenter-Back
+```
+
+After updating, commit the new submodule pointers:
+
+```bash
+git add VictoryCenter-Client VictoryCenter-Back
+git commit -m "chore: update submodules to latest"
+```
