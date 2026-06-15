@@ -1,44 +1,62 @@
-# VictoryCenter DevOps
+# VictoryCenter — Local Setup
 
-Infrastructure and deployment configuration for VictoryCenter.
+## Prerequisites
+
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed and running
+
+## Steps
+
+**1. Clone the repo**
+```bash
+git clone --recurse-submodules https://github.com/Pichus/VictoryCenter-DevOps.git
+cd VictoryCenter-DevOps
+```
+
+**2. Create your env file**
+```bash
+cp .env.example .env
+```
+No changes needed — the default values work out of the box.
+
+**3. Start everything**
+```bash
+docker compose up --build
+```
+First run takes ~5–10 minutes (builds frontend and backend from source).
+
+**4. Open the app**
+
+| Service | URL |
+|---------|-----|
+| Frontend | http://localhost:3000 |
+| Backend API | http://localhost:8080/api |
+
+Admin login credentials are in `.env` → `INITIAL_ADMIN_EMAIL` / `INITIAL_ADMIN_PASSWORD`.
+
+## Stopping
+
+```bash
+docker compose down
+```
+
+To also delete the database volume (full reset):
+```bash
+docker compose down -v
+```
+
+---
+
+## Updating to latest code
+
+```bash
+git pull
+git submodule update --remote --merge
+docker compose up --build
+```
 
 ## Submodules
 
-This repo includes two submodules:
-
-| Folder | Repo | Branch |
-|--------|------|--------|
-| `VictoryCenter-Client` | [VictoryCenter-Client](https://github.com/ita-social-projects/VictoryCenter-Client) | `release/1.0.0` |
-| `VictoryCenter-Back` | [VictoryCenter-Back](https://github.com/ita-social-projects/VictoryCenter-Back) | `release/1.0.0` |
-
-### Clone with submodules
-
-```bash
-git clone --recurse-submodules https://github.com/Pichus/VictoryCenter-DevOps.git
-```
-
-If already cloned without submodules:
-
-```bash
-git submodule update --init --recursive
-```
-
-### Update submodules to latest commits on their branch
-
-```bash
-git submodule update --remote --merge
-```
-
-Or update a single submodule:
-
-```bash
-git submodule update --remote --merge VictoryCenter-Client
-git submodule update --remote --merge VictoryCenter-Back
-```
-
-After updating, commit the new submodule pointers:
-
-```bash
-git add VictoryCenter-Client VictoryCenter-Back
-git commit -m "chore: update submodules to latest"
-```
+| Folder | Repo |
+|--------|------|
+| `VictoryCenter-Client` | [Frontend](https://github.com/ita-social-projects/VictoryCenter-Client) |
+| `VictoryCenter-Back` | [Backend](https://github.com/ita-social-projects/VictoryCenter-Back) |
