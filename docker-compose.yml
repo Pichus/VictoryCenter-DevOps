@@ -1,45 +1,43 @@
 version: '3'
 services:
-  certbot:
-    restart: always
-    image: certbot/certbot:latest
-    container_name: certbot
-    volumes:
-      - /certbot/www:/var/www/certbot/:rw
-      - /certbot/conf:/etc/letsencrypt/:rw
-  nginx:
-    restart: always
-    image: nginx:latest
-    container_name: nginx
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: vc-sqlserver
     ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./templates:/etc/nginx/templates
-      - /certbot/www:/var/www/certbot/:ro
-      - /certbot/conf:/etc/letsencrypt/:ro
-  frontend:
-    restart: always
-    image: victorycenterua/client:${DOCKER_TAG_FRONTEND}
-    pull_policy: always
-    container_name: frontend
-    expose:
-      - "80"
+      - "1433:1433"
     environment:
-      REACT_APP_BACKEND_URL: "https://backend.victorycenter.online/api"
-      REACT_APP_CF_TURNSTILE_SITE_KEY: ${REACT_APP_CF_TURNSTILE_SITE_KEY}
-  backend:
-    restart: always
-    image: victorycenterua/backend:${DOCKER_TAG_BACKEND}
-    container_name: backend
-    pull_policy: always
+      SA_PASSWORD: ${SA_PASSWORD}
+      ACCEPT_EULA: "Y"
     volumes:
-      - /mnt/static:/app/wwwroot
-    expose:
-      - "80:8080"
+      - sql_data:/var/opt/mssql
+
+  frontend:
+    build:
+      context: ./VictoryCenter-Client
+      dockerfile: ../Dockerfile.frontend.local
+      args:
+        REACT_APP_BACKEND_URL: ${REACT_APP_BACKEND_URL:-http://localhost:8080/api}
+    container_name: vc-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+  backend:
+    build:
+      context: ./VictoryCenter-Back
+      dockerfile: Dockerfile
+      args:
+        Configuration: debug
+    container_name: vc-backend
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./static:/app/wwwroot
     extra_hosts:
       - "host.docker.internal:host-gateway"
     environment:
+      ASPNETCORE_ENVIRONMENT: Development
       DB_CONNECTION_STRING: ${DB_CONNECTION_STRING}
       INITIAL_ADMIN_EMAIL: ${INITIAL_ADMIN_EMAIL}
       INITIAL_ADMIN_PASSWORD: ${INITIAL_ADMIN_PASSWORD}
@@ -58,13 +56,8 @@ services:
       RESEND_API_TOKEN: ${RESEND_API_TOKEN}
       WAY4PAY_API_URL: ${WAY4PAY_API_URL}
       ASPNETCORE_URLS: "http://0.0.0.0:8080"
-    
+    depends_on:
+      - sqlserver
+
 volumes:
-  backend:
-networks:
-  backend:
-    external: true
-    name: backend
-  frontend:
-    external: true
-    name: frontend
+  sql_data:
